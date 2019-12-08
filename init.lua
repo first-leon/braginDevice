@@ -15,6 +15,10 @@ device.sensors["t2"].value  = "0"
 period                      = 10000
 tv                          = 10000
 gist                        = 1
+delayTimer                  = 0
+relayPin=3
+gpio.mode(relayPin, gpio.OUTPUT)
+
 ln =dofile('ln.lc')
 longPressKey3Timer = 0
 function key(l, t)
@@ -106,10 +110,11 @@ mytimer:register(tv, tmr.ALARM_AUTO, function()
     if ( ( t + gist) > tonumber(device.sensors["t2"].value) ) then
         delayTimer = tmr.now()
         print('Disable power')
+        gpio.write(relayPin, gpio.LOW)
     end
-    
-    if ( (( t - gist) < tonumber(device.sensors["t2"].value)) and ((tmr.now() - delayTimer) > tonumber(tv)*1000000) ) then
+    if ( (( t - gist) < tonumber(device.sensors["t2"].value)) and ((tmr.now() - delayTimer) > tonumber(tv)*1000) ) then
         print('Enable power')
+        gpio.write(relayPin, gpio.HIGH)
     end
     
 end)
