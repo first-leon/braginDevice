@@ -12,9 +12,10 @@ device.sensors["h2"]        = {}
 device.sensors["h2"].value  = "0"
 device.sensors["t2"]        = {}
 device.sensors["t2"].value  = "0"
-
-ln = {0,0.69,1.1,1.39,1.61,1.79,1.95,2.08,2.2,2.3,2.4,2.48,2.56,2.64,2.71,2.77,2.83,2.89,2.94,3,3.04,3.09,3.14,3.18,3.22,3.26,3.3,3.33,3.37,3.4,3.43,3.47,3.5,3.53,3.56,3.58,3.61,3.64,3.66,3.69,3.71,3.74,3.76,3.78,3.81,3.83,3.85,3.87,3.89,3.91,3.93,3.95,3.97,3.99,4.01,4.03,4.04,4.06,4.08,4.09,4.11,4.13,4.14,4.16,4.17,4.19,4.2,4.22,4.23,4.25,4.26,4.28,4.29,4.3,4.32,4.33,4.34,4.36,4.37,4.38,4.39,4.41,4.42,4.43,4.44,4.45,4.47,4.48,4.49,4.5,4.51,4.52,4.53,4.54,4.55,4.56,4.57,4.58,4.6,4.61}
-
+period                      = 10000
+tv                          = 10000
+gist                        = 1
+ln =dofile('ln.lc')
 longPressKey3Timer = 0
 function key(l, t)
     if ( l == 0 ) then
@@ -27,7 +28,7 @@ end
 gpio.mode(BUTTONpin,gpio.INT,gpio.PULLUP)
 gpio.trig(BUTTONpin, 'both', key)
 function httpServerStart()
-    dofile('httpServer.lua')
+    dofile('httpServer.lc')
     httpServer:listen(80)
     httpServer:use('/api/version', function(req, res)
         resp                    = {}
@@ -46,14 +47,18 @@ if file.exists("eus_params.lua") then
     p = dofile('eus_params.lua')
 end
 if p then
-  wf = {}
-  wf.ssid = p.wifi_ssid
-  wf.pwd = p.wifi_password
-  device.id = p.device_id
-  p = nil
+  wf        = {}
+  wf.ssid   = p.wifi_ssid
+  wf.pwd    = p.wifi_password
   wifi.setmode(wifi.STATION)
   wifi.sta.config(wf)
   wf=nil
+  device.id = p.device_id
+  perid     = p.period or period
+  gist      = p.gist or gist
+  tv        = p.tv  or tv
+  print('Parameters: ', sjson.encode(p))
+  p         = nil
   node.egc.setmode(node.egc.ALWAYS)
   httpServerStart()
 else
@@ -90,8 +95,23 @@ function GetSensorData()
 end
 
 local mytimer = tmr.create()
-mytimer:register(10000, tmr.ALARM_AUTO, function()
+mytimer:register(tv, tmr.ALARM_AUTO, function()
     GetSensorData()
+    local gamma = 17.27 * device.sensors["t1"].value/(237.7+device.sensors["t1"].value) + ln[math.floor(device.sensors["h1"].value)]
+    local t = 237.7 * gamma/ (17.27 - gamma)
+    print('gist: ', gist)
+    print('gamma: ', gamma)
+    print('t: ', t)
+    print(sjson.encode(device))
+    if ( ( t + gist) > tonumber(device.sensors["t2"].value) ) then
+        delayTimer = tmr.now()
+        print('Disable power')
+    end
+    
+    if ( (( t - gist) < tonumber(device.sensors["t2"].value)) and ((tmr.now() - delayTimer) > tonumber(tv)*1000000) ) then
+        print('Enable power')
+    end
+    
 end)
-mytimer:interval(10000)
+mytimer:interval(tv)
 mytimer:start()

@@ -3,6 +3,7 @@
 
 <head>
 	<meta name='viewport' content='width=device-width, initial-scale=1.0'>
+    <meta charset="UTF-8">
 	<title>DomBrain WiFi Login</title>
 	<style type=text/css>
 		* {
@@ -161,8 +162,9 @@
 					</div>
 					<input id=ssid name=wifi_ssid type=text autocorrect=off autocapitalize=none placeholder='Wi-Fi Name' />
 					<input name=wifi_password type=password autocorrect=off autocapitalize=none autocomplete=off placeholder=Password />
-					<input name=device_id type=text autocorrect=off autocapitalize=none autocomplete=off placeholder='Device id' />
-					<!-- You can add inputs here and have them pop up in your lua code through the file eus_params.lua -->
+					<input name=gist type=text autocorrect=off autocapitalize=none autocomplete=off placeholder='Гистерезис: °' />
+					<input name=tv type=text autocorrect=off autocapitalize=none autocomplete=off placeholder='Задержка включения: ms' />
+					<input name=period type=text autocorrect=off autocapitalize=none autocomplete=off placeholder='Период опроса: ms' />
 					<input type="submit" value="Save"/>
 				</form>
 			</div>
