@@ -1,0 +1,5 @@
+nodemcu-master-14-modules-2019-11-20-16-07-36-float.bin
+nodemcu-master-14-modules-2019-11-20-16-07-36-integer.bin
+
+dht, file, gpio, http, i2c, net, node, ow, pwm2, sjson, spi, tmr, uart, wifi.
+
