@@ -16,15 +16,16 @@ period                      = 10000
 tv                          = 10000
 gist                        = 1
 delayTimer                  = 0
-relayPin=3
-gpio.mode(relayPin, gpio.OUTPUT)
 
-ln =dofile('ln.lc')
+ln=dofile('ln.lc')
 longPressKey3Timer = 0
-function key(l, t)
-    if ( l == 0 ) then
-        longPressKey3Timer = t
-    elseif ( t - longPressKey3Timer > 1000000) then
+
+relayPin=4
+gpio.mode(BUTTONpin, gpio.OUTPUT)
+function key(pin, time)
+    if ( pin == 0 ) then
+        longPressKey3Timer = time
+    elseif ( time - longPressKey3Timer > 1000000) then
         file.remove("eus_params.lua")
         node.restart()
     end
